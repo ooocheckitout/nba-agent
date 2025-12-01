@@ -1,6 +1,7 @@
 {
-    "recommendations": [
-        "ms-python.black-formatter",
-        "ms-python.mypy-type-checker"
-    ]
+  "recommendations": [
+    "ms-python.black-formatter",
+    "ms-python.mypy-type-checker",
+    "charliermarsh.ruff"
+  ]
 }

@@ -11,10 +11,12 @@ sentry_sdk.init(
     # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
     send_default_pii=True,
     environment=os.getenv("ENVIRONMENT", "production"),
+    enable_logs=True,
 )
 
 import streamlit as st
 import time
+import logging
 
 from models import Message, Suggestion, User
 
@@ -61,7 +63,7 @@ def subscribe():
 
     is_registering = False
     if st.button("Register", disabled=is_invalid_email or is_registering):
-        print(f"Registering email: {email}")
+        logging.info(f"Registering email: {email}")
 
         local_storage.setItem("user", User(email=email).model_dump_json())
         st.success("Thanks — you'll hear from us soon!")
@@ -70,5 +72,7 @@ def subscribe():
         st.rerun()
 
 
-if not local_storage.getItem("user"):
+saved_user_json = local_storage.getItem("user")
+
+if not saved_user_json:
     subscribe()
