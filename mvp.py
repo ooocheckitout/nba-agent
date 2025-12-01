@@ -11,7 +11,7 @@ sentry_sdk.init(
 import streamlit as st
 import time
 
-from models.chat import Message, Suggestion
+from models import Message, Suggestion, User
 
 
 st.title("💬 NBA Analytics Agent")
@@ -57,12 +57,12 @@ def subscribe():
     if st.button("Register", disabled=not is_valid_email):
         print(f"Registering email: {email}")
 
-        local_storage.setItem("email", email)
+        local_storage.setItem("user", User(email=email).to_json())
         st.success("Thanks — you'll hear from us soon!")
 
         time.sleep(2)
         st.rerun()
 
 
-if not local_storage.getItem("email"):
+if not local_storage.getItem("user"):
     subscribe()
