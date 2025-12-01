@@ -78,5 +78,3 @@ saved_user_json = local_storage.getItem("user")
 
 if not saved_user_json:
     subscribe()
-
-subscribe()
