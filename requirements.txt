@@ -2,3 +2,4 @@ streamlit
 openai
 dotenv
 streamlit-local-storage
+sentry-sdk

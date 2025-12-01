@@ -1,3 +1,13 @@
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://072fd2564ff917a997fe783bc1ed30cc@o4509656915574784.ingest.de.sentry.io/4510461910253648",
+    # Add data like request headers and IP for users,
+    # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+    send_default_pii=True,
+)
+
+
 import streamlit as st
 import time
 
