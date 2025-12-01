@@ -1,0 +1,10 @@
+{
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/.mypy_cache": true,
+        "**/.venv": true,
+    },
+    "files.autoSave": "onFocusChange",
+    "editor.formatOnSave": true,
+    
+}

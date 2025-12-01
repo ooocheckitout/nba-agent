@@ -1,2 +1,4 @@
 streamlit
 openai
+dotenv
+streamlit-local-storage
