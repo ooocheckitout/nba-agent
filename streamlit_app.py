@@ -1,3 +1,8 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import sentry_sdk
 
 sentry_sdk.init(
@@ -5,8 +10,8 @@ sentry_sdk.init(
     # Add data like request headers and IP for users,
     # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
     send_default_pii=True,
+    environment=os.getenv("ENVIRONMENT", "production"),
 )
-
 
 import streamlit as st
 import time
@@ -49,12 +54,13 @@ def subscribe():
 
     email = st.text_input("Email: ", placeholder="example@gmail.com")
 
-    is_valid_email = email and "@" in email and "." in email
+    is_invalid_email = not email or "@" not in email or "." not in email
 
-    if email and not is_valid_email:
+    if email and is_invalid_email:
         st.info("Please enter a valid email to register.")
 
-    if st.button("Register", disabled=not is_valid_email):
+    is_registering = False
+    if st.button("Register", disabled=is_invalid_email or is_registering):
         print(f"Registering email: {email}")
 
         local_storage.setItem("user", User(email=email).model_dump_json())
