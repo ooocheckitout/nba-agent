@@ -43,6 +43,8 @@ for message in messages:
     with st.chat_message(message.role):
         st.markdown(message.content)
 
+st.info("This chat is for demonstration purposes only.", icon="⚠️")
+
 st.chat_input("Ask me about NBA analytics...", disabled=True)
 
 from streamlit_local_storage import LocalStorage
@@ -68,7 +70,7 @@ def subscribe():
         local_storage.setItem("user", User(email=email).model_dump_json())
         st.success("Thanks — you'll hear from us soon!")
 
-        time.sleep(2)
+        time.sleep(3)
         st.rerun()
 
 
@@ -76,3 +78,5 @@ saved_user_json = local_storage.getItem("user")
 
 if not saved_user_json:
     subscribe()
+
+subscribe()
