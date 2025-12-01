@@ -57,7 +57,7 @@ def subscribe():
     if st.button("Register", disabled=not is_valid_email):
         print(f"Registering email: {email}")
 
-        local_storage.setItem("user", User(email=email).to_json())
+        local_storage.setItem("user", User(email=email).model_dump_json())
         st.success("Thanks — you'll hear from us soon!")
 
         time.sleep(2)
