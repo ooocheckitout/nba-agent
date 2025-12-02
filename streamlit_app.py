@@ -18,6 +18,8 @@ import subprocess
 subprocess.run("pwd", shell=True)
 subprocess.run("ls", shell=True)
 subprocess.run("ls /usr/local/lib", shell=True)
+subprocess.run("ls /usr/local/lib/python3.11", shell=True)
+subprocess.run("ls /usr/local/lib/python3.13", shell=True)
 subprocess.run(
     "ls /usr/local/lib/python3.11/site-packages/streamlit/static", shell=True
 )
