@@ -15,6 +15,8 @@ import subprocess
 
 # r".venv\Lib\site-packages\streamlit\static\index.html"
 subprocess.run("ls", shell=True)
+subprocess.run("ls /usr/local/lib", shell=True)
+subprocess.run("pwd", shell=True)
 
 import time
 import logging
