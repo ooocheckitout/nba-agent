@@ -11,16 +11,6 @@ sentry_sdk.init(
     enable_logs=True,
 )
 
-import subprocess
-
-subprocess.run("ls /mount/src/nba-agent", shell=True)
-subprocess.run("ls /home/appuser", shell=True)
-subprocess.run("ls /home/adminuser/", shell=True)
-subprocess.run(
-    "chmod +x /mount/src/nba-agent/inject-head-stuff.sh && /mount/src/nba-agent/inject-head-stuff.sh",
-    shell=True,
-)
-
 stat_counter_script = """
 <!-- Default Statcounter code for nba-agent
 https://nba-agent.streamlit.com/ -->
@@ -49,7 +39,7 @@ import time
 import logging
 from pyisemail import is_email
 
-from models import Message, Suggestion, Role, User
+from models import DataMessage, Message, Suggestion, Role, TextMessage, User
 from typing import Any
 
 st.set_page_config(
@@ -62,38 +52,41 @@ st.title("Nikola Jokic vs Luka Doncic")
 messages: list[Message] = [
     Message(
         role=Role.user,
-        content="Compare Nikola Jokic vs Luka Doncic in the 2024-25 season.",
+        content=[
+            TextMessage(
+                text="Compare Nikola Jokic vs Luka Doncic in the 2024-25 season."
+            )
+        ],
     ),
     Message(
         role=Role.assistant,
-        content=(
-            "In the 2024-25 NBA regular season, Luka Dončić is averaging more points per game, while Nikola Jokić is leading in rebounds and assists per game with significantly higher efficiency.\n\n"
-            "### 2024-25 Season Per Game Statistics\n\n"
-            "| Statistic | Nikola Jokić (DEN) | Luka Dončić (LAL) |\n"
-            "|---|---:|---:|\n"
-            "| Points Per Game (PPG) | 29.6 | 28.2 |\n"
-            "| Rebounds Per Game (RPG) | 12.7 | 8.1 |\n"
-            "| Assists Per Game (APG) | 10.2 | 7.5 |\n"
-            "| Steals Per Game (SPG) | 1.8 | 1.6 |\n"
-            "| Blocks Per Game (BPG) | 0.6 | 0.4 |\n"
-            "| Field Goal Percentage (FG%) | 57.6% | 43.8% |\n"
-            "| Three Point Percentage (3P%) | 41.7% | 37.9% |\n\n"
-            "### Context and Analysis\n\n"
-            "- **Scoring and Efficiency**: Luka Dončić is a slightly higher volume scorer, but Nikola Jokić is significantly more efficient from the field overall, particularly in field goal percentage, and has a better true shooting percentage (TS%).\n"
-            "- **Playmaking and Rebounding**: As expected from their positions (Jokić as a center, Dončić as a guard), Jokić has a clear advantage in rebounding, while both are elite passers, with Jokić currently holding a slight edge in assists per game this season.\n"
-            "- **Team Performance**: Both players have a significant impact on their respective teams. Jokić's Denver Nuggets had a 1-1 record versus Dončić's Los Angeles Lakers during the games they played against each other in the 2024-25 season.\n"
-            "- **Head-to-Head**: In two head-to-head games during the 2024-25 season, Jokić averaged 24.5 points, 15.5 rebounds, and 12.5 assists, while Dončić averaged 28.0 points, 9.5 rebounds, and 8.0 assists.\n\n"
-            "*Note: The 2024-25 NBA season concluded in June 2025. The data provided reflects the final statistics for that season.*"
-        ),
-        columns=["Statistic", "Nikola Jokic", "Luka Doncic"],
-        data=[
-            ["PPG", 29.6, 28.2],
-            ["RPG", 12.7, 8.1],
-            ["APG", 10.2, 7.5],
-            ["SPG", 1.8, 1.6],
-            ["BPG", 0.6, 0.4],
-            ["FG%", 57.6, 43.8],
-            ["3P%", 41.7, 37.9],
+        content=[
+            TextMessage(
+                text="In the 2024-25 NBA regular season, Luka Dončić is averaging more points per game, while Nikola Jokić is leading in rebounds and assists per game with significantly higher efficiency."
+            ),
+            DataMessage(
+                title="##### 2024-25 Season Stats Comparison: Nikola Jokić vs Luka Dončić",
+                columns=["Statistic", "Nikola Jokic", "Luka Doncic"],
+                data=[
+                    ["PPG", 29.6, 28.2],
+                    ["RPG", 12.7, 8.1],
+                    ["APG", 10.2, 7.5],
+                    ["SPG", 1.8, 1.6],
+                    ["BPG", 0.6, 0.4],
+                    ["FG%", 57.6, 43.8],
+                    ["3P%", 41.7, 37.9],
+                ],
+            ),
+            TextMessage(
+                text=(
+                    "### Context and Analysis\n\n"
+                    "- **Scoring and Efficiency**: Luka Dončić is a slightly higher volume scorer, but Nikola Jokić is significantly more efficient from the field overall, particularly in field goal percentage, and has a better true shooting percentage (TS%).\n"
+                    "- **Playmaking and Rebounding**: As expected from their positions (Jokić as a center, Dončić as a guard), Jokić has a clear advantage in rebounding, while both are elite passers, with Jokić currently holding a slight edge in assists per game this season.\n"
+                    "- **Team Performance**: Both players have a significant impact on their respective teams. Jokić's Denver Nuggets had a 1-1 record versus Dončić's Los Angeles Lakers during the games they played against each other in the 2024-25 season.\n"
+                    "- **Head-to-Head**: In two head-to-head games during the 2024-25 season, Jokić averaged 24.5 points, 15.5 rebounds, and 12.5 assists, while Dončić averaged 28.0 points, 9.5 rebounds, and 8.0 assists.\n\n"
+                    "*Note: The 2024-25 NBA season concluded in June 2025. The data provided reflects the final statistics for that season.*"
+                ),
+            ),
         ],
     ),
 ]
@@ -120,19 +113,20 @@ st.markdown(
 for message in messages:
     with st.container(key=f"message-{message.role.value}"):
         with st.chat_message(message.role):
-            st.markdown(message.content)
+            for msg in message.content:
+                if isinstance(msg, TextMessage):
+                    st.markdown(msg.text)
 
-            if not (message.columns and message.data):
-                continue
-
-            chat_tab, data_tab = st.tabs(["Chart", "Data"])
-            with data_tab:
-                df = pd.DataFrame(message.data, columns=message.columns)
-                # convention first column is x-axis
-                df = df.set_index(message.columns[0])
-                st.dataframe(df, width="stretch")
-            with chat_tab:
-                st.bar_chart(df, sort=False, stack=False)
+                elif isinstance(msg, DataMessage):
+                    st.markdown(msg.title)
+                    chat_tab, data_tab = st.tabs(["Chart", "Data"])
+                    with data_tab:
+                        df = pd.DataFrame(msg.data, columns=msg.columns)
+                        # convention first column is x-axis
+                        df = df.set_index(msg.columns[0])
+                        st.dataframe(df, width="stretch")
+                    with chat_tab:
+                        st.bar_chart(df, sort=False, stack=False)
 
 
 from streamlit_local_storage import LocalStorage
@@ -193,7 +187,7 @@ def subscribe():
                 st.rerun()
 
 
-@st.dialog("Oops! We're not live yet...", dismissible=False)
+@st.dialog("Oops! We're not live yet...")
 def notify():
     st.write(
         "... but we can't wait to show you what's coming! Sign up for early access!"

@@ -12,11 +12,19 @@ class Role(str, Enum):
     user = "user"
 
 
+class TextMessage(BaseModel):
+    text: str
+
+
+class DataMessage(BaseModel):
+    title: str
+    columns: list[str]
+    data: list[Any]
+
+
 class Message(BaseModel):
     role: Role
-    content: str
-    columns: list[str] = Field(default_factory=list)
-    data: list[Any] = Field(default_factory=list)
+    content: list[TextMessage | DataMessage]
 
 
 class Suggestion(BaseModel):
