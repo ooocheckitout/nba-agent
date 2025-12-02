@@ -1,5 +1,8 @@
 streamlit
 openai
-dotenv
-streamlit-local-storage
+# dotenv
+# streamlit-local-storage
 sentry-sdk
+st-gsheets-connection
+# authlib
+pyIsEmail

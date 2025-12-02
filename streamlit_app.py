@@ -1,55 +1,86 @@
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
+import pandas as pd
+import streamlit as st
 import sentry_sdk
 
 sentry_sdk.init(
-    dsn="https://072fd2564ff917a997fe783bc1ed30cc@o4509656915574784.ingest.de.sentry.io/4510461910253648",
+    environment=st.secrets.sentry.environment,
+    dsn=st.secrets.sentry.dsn,
     # Add data like request headers and IP for users,
     # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
     send_default_pii=True,
-    environment=os.getenv("ENVIRONMENT", "production"),
     enable_logs=True,
 )
 
-import streamlit as st
 import time
 import logging
+from pyisemail import is_email
 
-from models import Message, Suggestion, User
+from models import Message, Suggestion, Role
+from typing import Any
 
 
 st.title("💬 NBA Analytics Agent")
 
 messages: list[Message] = [
     Message(
-        role="user",
-        content="How did the Boston Celtics perform in the 2022-23 season?",
+        role=Role.user,
+        content="Compare Nikola Jokic vs Luka Doncic in the 2024-25 season.",
     ),
     Message(
-        role="assistant",
-        content="The Boston Celtics had a strong 2022-23 season, finishing with a 57-25 record and securing the 2nd seed in the Eastern Conference. They advanced to the Eastern Conference Finals but were eliminated by the Miami Heat in 7 games. Key players included Jayson Tatum and Jaylen Brown, who both averaged over 25 points per game.",
+        role=Role.assistant,
+        content=(
+            "In the 2024-25 NBA regular season, Luka Dončić is averaging more points per game, while Nikola Jokić is leading in rebounds and assists per game with significantly higher efficiency.\n\n"
+            "### 2024-25 Season Per Game Statistics\n\n"
+            "| Statistic | Nikola Jokić (DEN) | Luka Dončić (LAL) |\n"
+            "|---|---:|---:|\n"
+            "| Points Per Game (PPG) | 29.6 | 28.2 |\n"
+            "| Rebounds Per Game (RPG) | 12.7 | 8.1 |\n"
+            "| Assists Per Game (APG) | 10.2 | 7.5 |\n"
+            "| Steals Per Game (SPG) | 1.8 | 1.6 |\n"
+            "| Blocks Per Game (BPG) | 0.6 | 0.4 |\n"
+            "| Field Goal Percentage (FG%) | 57.6% | 43.8% |\n"
+            "| Three Point Percentage (3P%) | 41.7% | 37.9% |\n\n"
+            "### Context and Analysis\n\n"
+            "- **Scoring and Efficiency**: Luka Dončić is a slightly higher volume scorer, but Nikola Jokić is significantly more efficient from the field overall, particularly in field goal percentage, and has a better true shooting percentage (TS%).\n"
+            "- **Playmaking and Rebounding**: As expected from their positions (Jokić as a center, Dončić as a guard), Jokić has a clear advantage in rebounding, while both are elite passers, with Jokić currently holding a slight edge in assists per game this season.\n"
+            "- **Team Performance**: Both players have a significant impact on their respective teams. Jokić's Denver Nuggets had a 1-1 record versus Dončić's Los Angeles Lakers during the games they played against each other in the 2024-25 season.\n"
+            "- **Head-to-Head**: In two head-to-head games during the 2024-25 season, Jokić averaged 24.5 points, 15.5 rebounds, and 12.5 assists, while Dončić averaged 28.0 points, 9.5 rebounds, and 8.0 assists.\n\n"
+            "*Note: The 2024-25 NBA season concluded in June 2025. The data provided reflects the final statistics for that season.*"
+        ),
+        columns=["Statistic", "Nikola Jokic", "Luka Doncic"],
+        data=[
+            ["PPG", 29.6, 28.2],
+            ["RPG", 12.7, 8.1],
+            ["APG", 10.2, 7.5],
+            ["SPG", 1.8, 1.6],
+            ["BPG", 0.6, 0.4],
+            ["FG%", 57.6, 43.8],
+            ["3P%", 41.7, 37.9],
+        ],
     ),
 ]
 suggestions: list[Suggestion] = [
-    Suggestion(text="📊 What was their win-loss record?"),
-    Suggestion(text="⭐ Who were the standout players?"),
-    Suggestion(text="🏀 How did they perform in the playoffs?"),
+    Suggestion(text="📊 Compare their advanced metrics (PER, TS%, WS/48)"),
+    Suggestion(text="🔁 Who contributed more in playmaking and clutch moments?"),
+    Suggestion(text="🏆 How did each perform in the 2025 playoffs?"),
 ]
+
 
 for message in messages:
     with st.chat_message(message.role):
         st.markdown(message.content)
 
-st.info("This chat is for demonstration purposes only.", icon="⚠️")
+        if not (message.columns and message.data):
+            continue
 
-st.chat_input("Ask me about NBA analytics...", disabled=True)
-
-from streamlit_local_storage import LocalStorage
-
-local_storage = LocalStorage()
+        chat_tab, data_tab = st.tabs(["Chart", "Data"])
+        with data_tab:
+            df = pd.DataFrame(message.data, columns=message.columns)
+            # convention first column is x-axis
+            df = df.set_index(message.columns[0])
+            st.dataframe(df, use_container_width=True)
+        with chat_tab:
+            st.bar_chart(df, sort=False, stack=False)
 
 
 @st.dialog("Get early access", dismissible=False)
@@ -58,23 +89,28 @@ def subscribe():
 
     email = st.text_input("Email: ", placeholder="example@gmail.com")
 
-    is_invalid_email = not email or "@" not in email or "." not in email
+    is_valid_email = is_email(email, check_dns=True)
 
-    if email and is_invalid_email:
-        st.info("Please enter a valid email to register.")
+    if email and not is_valid_email:
+        st.warning("Please enter a valid email address.", icon="⚠️")
 
-    is_registering = False
-    if st.button("Register", disabled=is_invalid_email or is_registering):
+    if st.button("Register", disabled=not is_valid_email):
         logging.info(f"Registering email: {email}")
 
-        local_storage.setItem("user", User(email=email).model_dump_json())
+        # local_storage.setItem("user", User(email=email).model_dump_json())
         st.success("Thanks — you'll hear from us soon!")
 
         time.sleep(3)
         st.rerun()
 
 
-saved_user_json = local_storage.getItem("user")
+for suggestion in suggestions:
+    if st.button(suggestion.text, disabled=False):
+        logging.info(f"Suggestion selected: {suggestion.text}")
+        subscribe()
 
-if not saved_user_json:
+st.info("This chat is for demonstration purposes only.", icon="⚠️")
+
+if prompt := st.chat_input("Ask me about NBA analytics..."):
+    logging.info(f"User prompt: {prompt}")
     subscribe()

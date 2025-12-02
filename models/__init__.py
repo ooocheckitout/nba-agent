@@ -1,5 +1,6 @@
 from enum import Enum
-from pydantic import BaseModel
+from typing import Any
+from pydantic import BaseModel, Field
 
 
 class User(BaseModel):
@@ -14,6 +15,8 @@ class Role(str, Enum):
 class Message(BaseModel):
     role: Role
     content: str
+    columns: list[str] = Field(default_factory=list)
+    data: list[Any] = Field(default_factory=list)
 
 
 class Suggestion(BaseModel):
