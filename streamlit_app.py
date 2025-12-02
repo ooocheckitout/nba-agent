@@ -66,6 +66,15 @@ messages: list[Message] = [
             ),
             DataMessage(
                 title="##### 2024-25 Season Stats Comparison: Nikola Jokić vs Luka Dončić",
+                glossary={
+                    "PPG": "Points Per Game",
+                    "RPG": "Rebounds Per Game",
+                    "APG": "Assists Per Game",
+                    "SPG": "Steals Per Game",
+                    "BPG": "Blocks Per Game",
+                    "FG%": "Field Goal Percentage",
+                    "3P%": "Three-Point Percentage",
+                },
                 columns=["Statistic", "Nikola Jokic", "Luka Doncic"],
                 data=[
                     ["PPG", 29.6, 28.2],
@@ -119,6 +128,7 @@ for message in messages:
 
                 elif isinstance(msg, DataMessage):
                     st.markdown(msg.title)
+
                     chat_tab, data_tab = st.tabs(["Chart", "Data"])
                     with data_tab:
                         df = pd.DataFrame(msg.data, columns=msg.columns)
@@ -127,6 +137,14 @@ for message in messages:
                         st.dataframe(df, width="stretch")
                     with chat_tab:
                         st.bar_chart(df, sort=False, stack=False)
+
+                    with st.expander("Glossary", expanded=False):
+                        glossary_lines = [
+                            f"- :small[**{term}**: {definition}]"
+                            for term, definition in msg.glossary.items()
+                        ]
+                        glossary_md = "\n".join(glossary_lines)
+                        st.markdown(glossary_md)
 
 
 from streamlit_local_storage import LocalStorage

@@ -18,6 +18,7 @@ class TextMessage(BaseModel):
 
 class DataMessage(BaseModel):
     title: str
+    glossary: dict[str, str]
     columns: list[str]
     data: list[Any]
 
