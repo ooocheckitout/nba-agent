@@ -13,8 +13,6 @@ if [ ! -f "$INJECT_FILE" ]; then
   exit 1
 fi
 
-cat $INJECT_FILE
-
 INJECTION=$(<"$INJECT_FILE")
 awk -v injection="$INJECTION" '
     BEGIN { IGNORECASE = 1 }
@@ -25,5 +23,3 @@ awk -v injection="$INJECTION" '
     }
     { print }
 ' "$HTML_FILE" > "${HTML_FILE}.tmp" && mv "${HTML_FILE}.tmp" "$HTML_FILE"
-
-cat $HTML_FILE

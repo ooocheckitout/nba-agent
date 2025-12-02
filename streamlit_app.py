@@ -14,18 +14,11 @@ sentry_sdk.init(
 import subprocess
 import pathlib
 
-index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
-print(f"Streamlit index path: {index_path}")
-
-subprocess.run("whoami", shell=True)
-subprocess.run("echo ~", shell=True)
-subprocess.run("pwd", shell=True)
-subprocess.run(
-    "ls /home/adminuser/venv/lib/python3.13/site-packages/streamlit/static", shell=True
-)
 subprocess.run("ls /mount/src/nba-agent", shell=True)
+subprocess.run("ls /home/appuser", shell=True)
+subprocess.run("ls /home/adminuser/", shell=True)
 subprocess.run(
-    "chmod +x /mount/src/nba-agent/inject-head-stuff.sh && sudo /mount/src/nba-agent/inject-head-stuff.sh",
+    "chmod +x /mount/src/nba-agent/inject-head-stuff.sh && /mount/src/nba-agent/inject-head-stuff.sh",
     shell=True,
 )
 
