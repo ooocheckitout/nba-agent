@@ -17,6 +17,8 @@ import subprocess
 # Streamlit Community Cloud /mount/src/nba-agent
 subprocess.run("pwd", shell=True)
 subprocess.run("ls", shell=True)
+subprocess.run("which python", shell=True)
+subprocess.run("which python3", shell=True)
 subprocess.run("ls /usr/local/lib", shell=True)
 subprocess.run("ls /usr/local/lib/python3.11", shell=True)
 subprocess.run("ls /usr/local/lib/python3.13", shell=True)
