@@ -13,10 +13,16 @@ sentry_sdk.init(
 
 import subprocess
 
-# r".venv\Lib\site-packages\streamlit\static\index.html"
+# Streamlit Community Cloud /usr/local/lib/python3.13/site-packages/streamlit/static/index.html
+# Streamlit Community Cloud /mount/src/nba-agent
+subprocess.run("pwd", shell=True)
 subprocess.run("ls", shell=True)
 subprocess.run("ls /usr/local/lib", shell=True)
-subprocess.run("pwd", shell=True)
+subprocess.run(
+    "chmod +x /mount/src/nba-agent/inject-head-stuff.sh && /mount/src/nba-agent/inject-head-stuff.sh",
+    shell=True,
+)
+
 
 import time
 import logging
