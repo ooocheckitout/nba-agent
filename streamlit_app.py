@@ -154,7 +154,7 @@ def thanks():
 
     with st.container(horizontal_alignment="right"):
         if st.button("Close"):
-            st.session_state.open_dialog_index = 2
+            st.session_state.open_dialog_index = None
             st.session_state.default_open_dialog_index = 2
             st.rerun()
 
