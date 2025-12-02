@@ -19,6 +19,12 @@ subprocess.run("pwd", shell=True)
 subprocess.run("ls", shell=True)
 subprocess.run("ls /usr/local/lib", shell=True)
 subprocess.run(
+    "ls /usr/local/lib/python3.11/site-packages/streamlit/static", shell=True
+)
+subprocess.run(
+    "ls /usr/local/lib/python3.13/site-packages/streamlit/static", shell=True
+)
+subprocess.run(
     "chmod +x /mount/src/nba-agent/inject-head-stuff.sh && /mount/src/nba-agent/inject-head-stuff.sh",
     shell=True,
 )
