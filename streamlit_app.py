@@ -31,7 +31,7 @@ from models import Message, Suggestion, Role
 from typing import Any
 
 st.set_page_config(
-    page_title="NBA Stats Agent",
+    page_title="Ask NBA AI",
     page_icon="🏀",
     initial_sidebar_state="collapsed",
 )
@@ -143,3 +143,26 @@ st.caption("Knowledge cut-off: June 2025")
 if prompt := st.chat_input("Ask me about NBA analytics..."):
     logging.info(f"User prompt: {prompt}")
     subscribe()
+
+
+st.html(
+    """
+<!-- Default Statcounter code for nba-agent
+https://nba-agent.streamlit.com/ -->
+<script type="text/javascript">
+var sc_project=13187738; 
+var sc_invisible=1; 
+var sc_security="9ebb08ad"; 
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="free hit
+counter" href="https://statcounter.com/"
+target="_blank"><img class="statcounter"
+src="https://c.statcounter.com/13187738/0/9ebb08ad/1/"
+alt="free hit counter"
+referrerPolicy="no-referrer-when-downgrade"></a></div></noscript>
+<!-- End of Statcounter Code -->
+"""
+)
