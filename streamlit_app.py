@@ -18,8 +18,12 @@ from pyisemail import is_email
 from models import Message, Suggestion, Role
 from typing import Any
 
-
-st.title("💬 NBA Analytics Agent")
+st.set_page_config(
+    page_title="NBA Stats Agent",
+    page_icon="🏀",
+    initial_sidebar_state="collapsed",
+)
+st.title("Nikola Jokic vs Luka Doncic")
 
 messages: list[Message] = [
     Message(
@@ -64,6 +68,17 @@ suggestions: list[Suggestion] = [
     Suggestion(text="🔁 Who contributed more in playmaking and clutch moments?"),
     Suggestion(text="🏆 How did each perform in the 2025 playoffs?"),
 ]
+st.markdown(
+    """
+<style>
+    .st-emotion-cache-1fee4w7 {
+        flex-direction: row-reverse;
+        text-align: right;
+    }
+</style>
+""",
+    unsafe_allow_html=True,
+)
 
 
 for message in messages:
@@ -73,12 +88,13 @@ for message in messages:
         if not (message.columns and message.data):
             continue
 
+        st.caption("Visualizations")
         chat_tab, data_tab = st.tabs(["Chart", "Data"])
         with data_tab:
             df = pd.DataFrame(message.data, columns=message.columns)
             # convention first column is x-axis
             df = df.set_index(message.columns[0])
-            st.dataframe(df, width="content")
+            st.dataframe(df, width="stretch")
         with chat_tab:
             st.bar_chart(df, sort=False, stack=False)
 
@@ -104,12 +120,13 @@ def subscribe():
         st.rerun()
 
 
+st.caption("Suggestions")
 for suggestion in suggestions:
-    if st.button(suggestion.text, disabled=False):
+    if st.button(suggestion.text):
         logging.info(f"Suggestion selected: {suggestion.text}")
         subscribe()
 
-st.info("This chat is for demonstration purposes only.", icon="⚠️")
+st.caption("Knowledge cut-off: June 2025")
 
 if prompt := st.chat_input("Ask me about NBA analytics..."):
     logging.info(f"User prompt: {prompt}")
