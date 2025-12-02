@@ -12,7 +12,6 @@ sentry_sdk.init(
 )
 
 import subprocess
-import pathlib
 
 subprocess.run("ls /mount/src/nba-agent", shell=True)
 subprocess.run("ls /home/appuser", shell=True)
@@ -22,12 +21,35 @@ subprocess.run(
     shell=True,
 )
 
+stat_counter_script = """
+<!-- Default Statcounter code for nba-agent
+https://nba-agent.streamlit.com/ -->
+<script type="text/javascript">
+var sc_project=13187738; 
+var sc_invisible=1; 
+var sc_security="9ebb08ad"; 
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="free hit
+counter" href="https://statcounter.com/"
+target="_blank"><img class="statcounter"
+src="https://c.statcounter.com/13187738/0/9ebb08ad/1/"
+alt="free hit counter"
+referrerPolicy="no-referrer-when-downgrade"></a></div></noscript>
+<!-- End of Statcounter Code -->
+"""
+
+import streamlit.components.v1 as components
+
+components.html(stat_counter_script, height=0)
 
 import time
 import logging
 from pyisemail import is_email
 
-from models import Message, Suggestion, Role
+from models import Message, Suggestion, Role, User
 from typing import Any
 
 st.set_page_config(
@@ -80,10 +102,12 @@ suggestions: list[Suggestion] = [
     Suggestion(text="🔁 Who contributed more in playmaking and clutch moments?"),
     Suggestion(text="🏆 How did each perform in the 2025 playoffs?"),
 ]
+
+
 st.markdown(
     """
 <style>
-    .st-emotion-cache-1fee4w7 {
+    .st-key-message-user > div > div {
         flex-direction: row-reverse;
         text-align: right;
     }
@@ -94,91 +118,111 @@ st.markdown(
 
 
 for message in messages:
-    with st.chat_message(message.role):
-        st.markdown(message.content)
+    with st.container(key=f"message-{message.role.value}"):
+        with st.chat_message(message.role):
+            st.markdown(message.content)
 
-        if not (message.columns and message.data):
-            continue
+            if not (message.columns and message.data):
+                continue
 
-        st.caption("Visualizations")
-        chat_tab, data_tab = st.tabs(["Chart", "Data"])
-        with data_tab:
-            df = pd.DataFrame(message.data, columns=message.columns)
-            # convention first column is x-axis
-            df = df.set_index(message.columns[0])
-            st.dataframe(df, width="stretch")
-        with chat_tab:
-            st.bar_chart(df, sort=False, stack=False)
+            chat_tab, data_tab = st.tabs(["Chart", "Data"])
+            with data_tab:
+                df = pd.DataFrame(message.data, columns=message.columns)
+                # convention first column is x-axis
+                df = df.set_index(message.columns[0])
+                st.dataframe(df, width="stretch")
+            with chat_tab:
+                st.bar_chart(df, sort=False, stack=False)
+
+
+from streamlit_local_storage import LocalStorage
+
+local_storage = LocalStorage()
+
+if local_storage.getItem("user"):
+    st.session_state.setdefault("default_open_dialog_index", 2)
+else:
+    st.session_state.setdefault("default_open_dialog_index", 0)
+
+st.session_state.setdefault("open_dialog_index", None)
+st.session_state.setdefault("is_email_valid", None)
+
+
+@st.dialog("Welcome onboard!")
+def thanks():
+    st.success("Thanks — you'll hear from us soon!")
+
+    with st.container(horizontal_alignment="right"):
+        if st.button("Close"):
+            st.session_state.open_dialog_index = 2
+            st.session_state.default_open_dialog_index = 2
+            st.rerun()
 
 
 @st.dialog("Get early access", dismissible=False)
 def subscribe():
-    st.write("Enter your email to get an early access! No spam — unsubscribe anytime.")
+    st.markdown(
+        """
+        ### Your personal courtside AI is on the way! 🏀📊
 
-    email = st.text_input("Email: ", placeholder="example@gmail.com")
+        - Access player & team stats
+        - Generate comparisons and interactive charts
+        - Get data-driven insights and highlights
+        - Discover new metrics and trends
 
-    is_valid_email = is_email(email, check_dns=True)
+        Leave your email for early access and enjoy **your first month of analytics FREE**!
+    """
+    )
 
-    if email and not is_valid_email:
-        st.warning("Please enter a valid email address.", icon="⚠️")
+    with st.form("subscribe_form", border=False):
+        email = st.text_input("Email: ", placeholder="example@gmail.com")
+        submitted = st.form_submit_button("Register")
 
-    if st.button("Register", disabled=not is_valid_email):
-        logging.info(f"Registering email: {email}")
+        if submitted:
+            is_valid_email = is_email(email, check_dns=True)
 
-        # local_storage.setItem("user", User(email=email).model_dump_json())
-        st.success("Thanks — you'll hear from us soon!")
+            if not email or not is_valid_email:
+                st.warning("Please enter a valid email address.", icon="⚠️")
+            else:
+                logging.info(f"Registering email: {email}")
 
-        time.sleep(3)
-        st.rerun()
+                local_storage.setItem("user", User(email=email).model_dump_json())
+
+                st.session_state.open_dialog_index = 2
+
+                st.rerun()
+
+
+@st.dialog("Oops! We're not live yet...", dismissible=False)
+def notify():
+    st.write(
+        "... but we can't wait to show you what's coming! Sign up for early access!"
+    )
+
+    with st.container(horizontal_alignment="right"):
+        if st.button("Next"):
+            logging.info("User clicked 'Next' in the subscription dialog.")
+            st.session_state.open_dialog_index = 1
+            st.rerun()
 
 
 st.caption("Suggestions")
 for suggestion in suggestions:
     if st.button(suggestion.text):
         logging.info(f"Suggestion selected: {suggestion.text}")
-        subscribe()
+        st.session_state.open_dialog_index = st.session_state.default_open_dialog_index
+        st.rerun()
 
 st.caption("Knowledge cut-off: June 2025")
 
 if prompt := st.chat_input("Ask me about NBA analytics..."):
     logging.info(f"User prompt: {prompt}")
+    st.session_state.open_dialog_index = st.session_state.default_open_dialog_index
+    st.rerun()
+
+if st.session_state.open_dialog_index == 0:
+    notify()
+elif st.session_state.open_dialog_index == 1:
     subscribe()
-
-stat_counter_script = """
-<!-- Default Statcounter code for nba-agent
-https://nba-agent.streamlit.com/ -->
-<script type="text/javascript">
-var sc_project=13187738; 
-var sc_invisible=1; 
-var sc_security="9ebb08ad"; 
-</script>
-<script type="text/javascript"
-src="https://www.statcounter.com/counter/counter.js"
-async></script>
-<noscript><div class="statcounter"><a title="free hit
-counter" href="https://statcounter.com/"
-target="_blank"><img class="statcounter"
-src="https://c.statcounter.com/13187738/0/9ebb08ad/1/"
-alt="free hit counter"
-referrerPolicy="no-referrer-when-downgrade"></a></div></noscript>
-<!-- End of Statcounter Code -->
-"""
-
-import streamlit.components.v1 as components
-
-components.html(stat_counter_script, height=0)
-
-
-google_tag_script = """
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-TS8E0ZQSD9"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-TS8E0ZQSD9');
-</script>
-"""
-
-components.html(google_tag_script, height=0)
+elif st.session_state.open_dialog_index == 2:
+    thanks()
