@@ -19,15 +19,16 @@ subprocess.run("pwd", shell=True)
 subprocess.run("ls", shell=True)
 subprocess.run("which python", shell=True)
 subprocess.run("which python3", shell=True)
-subprocess.run("ls /usr/local/lib", shell=True)
-subprocess.run("ls /usr/local/lib/python3.11", shell=True)
-subprocess.run("ls /usr/local/lib/python3.13", shell=True)
-subprocess.run(
-    "ls /usr/local/lib/python3.11/site-packages/streamlit/static", shell=True
-)
-subprocess.run(
-    "ls /usr/local/lib/python3.13/site-packages/streamlit/static", shell=True
-)
+subprocess.run("python -m site", shell=True)
+# subprocess.run("ls /usr/local/lib", shell=True)
+# subprocess.run("ls /usr/local/lib/python3.11", shell=True)
+# subprocess.run("ls /usr/local/lib/python3.13", shell=True)
+# subprocess.run(
+#     "ls /usr/local/lib/python3.11/site-packages/streamlit/static", shell=True
+# )
+# subprocess.run(
+#     "ls /usr/local/lib/python3.13/site-packages/streamlit/static", shell=True
+# )
 subprocess.run(
     "chmod +x /mount/src/nba-agent/inject-head-stuff.sh && /mount/src/nba-agent/inject-head-stuff.sh",
     shell=True,
