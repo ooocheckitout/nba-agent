@@ -78,7 +78,7 @@ for message in messages:
             df = pd.DataFrame(message.data, columns=message.columns)
             # convention first column is x-axis
             df = df.set_index(message.columns[0])
-            st.dataframe(df, use_container_width=True)
+            st.dataframe(df, width="content")
         with chat_tab:
             st.bar_chart(df, sort=False, stack=False)
 
