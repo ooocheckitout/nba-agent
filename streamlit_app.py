@@ -11,6 +11,11 @@ sentry_sdk.init(
     enable_logs=True,
 )
 
+import subprocess
+
+# r".venv\Lib\site-packages\streamlit\static\index.html"
+subprocess.run("ls", shell=True)
+
 import time
 import logging
 from pyisemail import is_email
