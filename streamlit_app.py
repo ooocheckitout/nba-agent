@@ -20,7 +20,11 @@ print(f"Streamlit index path: {index_path}")
 # Streamlit Community Cloud /home/adminuser/venv/lib/site-packages/streamlit/static/index.html
 # Streamlit Community Cloud /mount/src/nba-agent
 subprocess.run("pwd", shell=True)
-subprocess.run("ls /home/adminuser/venv", shell=True)
+subprocess.run("ls /home/adminuser/venv/lib", shell=True)
+print("----")
+subprocess.run("ls /home/adminuser/venv/lib/site-packages", shell=True)
+print("----")
+subprocess.run("ls /home/adminuser/venv/lib/site-packages/streamlit/static", shell=True)
 subprocess.run("ls /mount/src/nba-agent", shell=True)
 subprocess.run(
     "chmod +x /mount/src/nba-agent/inject-head-stuff.sh && /mount/src/nba-agent/inject-head-stuff.sh",
