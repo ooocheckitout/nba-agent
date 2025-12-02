@@ -15,7 +15,7 @@ import subprocess
 import pathlib
 
 index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
-logging.info(f"Streamlit index path: {index_path}")
+print(f"Streamlit index path: {index_path}")
 
 # Streamlit Community Cloud /home/adminuser/venv/lib/site-packages/streamlit/static/index.html
 # Streamlit Community Cloud /mount/src/nba-agent
