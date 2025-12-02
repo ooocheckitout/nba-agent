@@ -1,6 +1,6 @@
 #!/bin/sh
 
-HTML_FILE=/usr/local/lib/python3.13/site-packages/streamlit/static/index.html
+HTML_FILE=/home/adminuser/venv/site-packages/streamlit/static/index.html
 INJECT_FILE=/mount/src/nba-agent/injected-script.html
 
 if [ ! -f "$HTML_FILE" ]; then
