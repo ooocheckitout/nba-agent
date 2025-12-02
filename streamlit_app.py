@@ -17,19 +17,14 @@ import pathlib
 index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
 print(f"Streamlit index path: {index_path}")
 
-# Streamlit Community Cloud /home/adminuser/venv/lib/site-packages/streamlit/static/index.html
-# Streamlit Community Cloud /mount/src/nba-agent
+subprocess.run("whoami", shell=True)
 subprocess.run("pwd", shell=True)
-subprocess.run("ls /home/adminuser/venv/lib/python3.13", shell=True)
-print("----")
-subprocess.run("ls /home/adminuser/venv/lib/python3.13/site-packages", shell=True)
-print("----")
 subprocess.run(
     "ls /home/adminuser/venv/lib/python3.13/site-packages/streamlit/static", shell=True
 )
 subprocess.run("ls /mount/src/nba-agent", shell=True)
 subprocess.run(
-    "chmod +x /mount/src/nba-agent/inject-head-stuff.sh && /mount/src/nba-agent/inject-head-stuff.sh",
+    "chmod +x /mount/src/nba-agent/inject-head-stuff.sh && sudo /mount/src/nba-agent/inject-head-stuff.sh",
     shell=True,
 )
 
