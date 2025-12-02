@@ -12,6 +12,10 @@ sentry_sdk.init(
 )
 
 import subprocess
+import pathlib
+
+index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
+print(f"Streamlit index path: {index_path}")
 
 # Streamlit Community Cloud /usr/local/lib/python3.13/site-packages/streamlit/static/index.html
 # Streamlit Community Cloud /mount/src/nba-agent
