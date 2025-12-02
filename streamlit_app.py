@@ -144,9 +144,7 @@ if prompt := st.chat_input("Ask me about NBA analytics..."):
     logging.info(f"User prompt: {prompt}")
     subscribe()
 
-
-st.html(
-    """
+stat_counter_script = """
 <!-- Default Statcounter code for nba-agent
 https://nba-agent.streamlit.com/ -->
 <script type="text/javascript">
@@ -165,4 +163,22 @@ alt="free hit counter"
 referrerPolicy="no-referrer-when-downgrade"></a></div></noscript>
 <!-- End of Statcounter Code -->
 """
-)
+
+import streamlit.components.v1 as components
+
+components.html(stat_counter_script, height=0)
+
+
+google_tag_script = """
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TS8E0ZQSD9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-TS8E0ZQSD9');
+</script>
+"""
+
+components.html(google_tag_script, height=0)
