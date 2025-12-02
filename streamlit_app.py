@@ -18,6 +18,7 @@ index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
 print(f"Streamlit index path: {index_path}")
 
 subprocess.run("whoami", shell=True)
+subprocess.run("echo ~", shell=True)
 subprocess.run("pwd", shell=True)
 subprocess.run(
     "ls /home/adminuser/venv/lib/python3.13/site-packages/streamlit/static", shell=True
