@@ -17,7 +17,7 @@ import pathlib
 index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
 print(f"Streamlit index path: {index_path}")
 
-# Streamlit Community Cloud /home/adminuser/venv/site-packages/streamlit/static/index.html
+# Streamlit Community Cloud /home/adminuser/venv/lib/site-packages/streamlit/static/index.html
 # Streamlit Community Cloud /mount/src/nba-agent
 subprocess.run("pwd", shell=True)
 subprocess.run("ls /home/adminuser/venv", shell=True)
