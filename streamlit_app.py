@@ -21,7 +21,7 @@ sentry_sdk.init(
 index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
 print(f"Streamlit index path: {index_path}")
 
-inject_path = pathlib.Path(__file__) / "injected-script.html"
+inject_path = pathlib.Path(__file__).parent / "injected-script.html"
 print(f"Injecting from path: {inject_path}")
 
 subprocess.run(
