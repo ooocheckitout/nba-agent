@@ -11,36 +11,19 @@ sentry_sdk.init(
     enable_logs=True,
 )
 
-stat_counter_script = """
-<!-- Default Statcounter code for nba-agent
-https://nba-agent.streamlit.com/ -->
-<script type="text/javascript">
-var sc_project=13187738; 
-var sc_invisible=1; 
-var sc_security="9ebb08ad"; 
-</script>
-<script type="text/javascript"
-src="https://www.statcounter.com/counter/counter.js"
-async></script>
-<noscript><div class="statcounter"><a title="free hit
-counter" href="https://statcounter.com/"
-target="_blank"><img class="statcounter"
-src="https://c.statcounter.com/13187738/0/9ebb08ad/1/"
-alt="free hit counter"
-referrerPolicy="no-referrer-when-downgrade"></a></div></noscript>
-<!-- End of Statcounter Code -->
-"""
-
-import streamlit.components.v1 as components
-
-components.html(stat_counter_script, height=0)
-
-import time
 import logging
 from pyisemail import is_email
 
 from models import DataMessage, Message, Suggestion, Role, TextMessage, User
-from typing import Any
+
+
+@st.cache_data
+def make_df(data, columns):
+    df = pd.DataFrame(data, columns=columns)
+    # convention first column is x-axis
+    df = df.set_index(columns[0])
+    return df
+
 
 st.set_page_config(
     page_title="Ask NBA AI",
@@ -118,7 +101,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
 for message in messages:
     with st.container(key=f"message-{message.role.value}"):
         with st.chat_message(message.role):
@@ -131,9 +113,7 @@ for message in messages:
 
                     chat_tab, data_tab = st.tabs(["Chart", "Data"])
                     with data_tab:
-                        df = pd.DataFrame(msg.data, columns=msg.columns)
-                        # convention first column is x-axis
-                        df = df.set_index(msg.columns[0])
+                        df = make_df(msg.data, msg.columns)
                         st.dataframe(df, width="stretch")
                     with chat_tab:
                         st.bar_chart(df, sort=False, stack=False)
@@ -158,6 +138,15 @@ else:
 
 st.session_state.setdefault("open_dialog_index", None)
 st.session_state.setdefault("is_email_valid", None)
+
+
+def open_dialog(index: int):
+    if index == 0:
+        notify()
+    elif index == 1:
+        subscribe()
+    elif index == 2:
+        thanks()
 
 
 @st.dialog("Welcome onboard!")
@@ -222,19 +211,12 @@ st.caption("Suggestions")
 for suggestion in suggestions:
     if st.button(suggestion.text):
         logging.info(f"Suggestion selected: {suggestion.text}")
-        st.session_state.open_dialog_index = st.session_state.default_open_dialog_index
-        st.rerun()
+        open_dialog(st.session_state.default_open_dialog_index)
 
 st.caption("Knowledge cut-off: June 2025")
 
 if prompt := st.chat_input("Ask me about NBA analytics..."):
     logging.info(f"User prompt: {prompt}")
-    st.session_state.open_dialog_index = st.session_state.default_open_dialog_index
-    st.rerun()
+    open_dialog(st.session_state.default_open_dialog_index)
 
-if st.session_state.open_dialog_index == 0:
-    notify()
-elif st.session_state.open_dialog_index == 1:
-    subscribe()
-elif st.session_state.open_dialog_index == 2:
-    thanks()
+open_dialog(st.session_state.open_dialog_index)
