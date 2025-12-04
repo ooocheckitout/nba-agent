@@ -1,6 +1,12 @@
+import pathlib
+import subprocess
 import pandas as pd
 import streamlit as st
 import sentry_sdk
+import logging
+from pyisemail import is_email
+
+from models import DataMessage, Message, Suggestion, Role, TextMessage, User
 
 sentry_sdk.init(
     environment=st.secrets.sentry.environment,
@@ -11,10 +17,17 @@ sentry_sdk.init(
     enable_logs=True,
 )
 
-import logging
-from pyisemail import is_email
 
-from models import DataMessage, Message, Suggestion, Role, TextMessage, User
+index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
+print(f"Streamlit index path: {index_path}")
+
+inject_path = pathlib.Path(__file__) / "injected-script.html"
+print(f"Injecting from path: {inject_path}")
+
+subprocess.run(
+    f"chmod +x inject-head-stuff.sh && ./inject-head-stuff.sh {index_path} {inject_path}",
+    shell=True,
+)
 
 
 @st.cache_data

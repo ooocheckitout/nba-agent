@@ -1,7 +1,7 @@
 #!/bin/sh
 
-HTML_FILE=/home/adminuser/venv/lib/python3.13/site-packages/streamlit/static/index.html
-INJECT_FILE=/mount/src/nba-agent/injected-script.html
+HTML_FILE="$1"
+INJECT_FILE="$2"
 
 if [ ! -f "$HTML_FILE" ]; then
   echo "Error: HTML file '$HTML_FILE' not found."
