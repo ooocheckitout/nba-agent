@@ -93,8 +93,11 @@ suggestions: list[Suggestion] = [
 st.markdown(
     """
 <style>
-    .st-key-message-user > div > div {
+    .st-key-message-user .stChatMessage {
+        text-align: right;
         flex-direction: row-reverse;
+    }
+    .st-key-message-user .stElementContainer  {
         text-align: right;
     }
 </style>
