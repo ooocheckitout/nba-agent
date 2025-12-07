@@ -18,18 +18,6 @@ sentry_sdk.init(
 )
 
 
-index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
-logging.info(f"Streamlit index path: {index_path}")
-
-inject_path = pathlib.Path(__file__).parent / "injected-script.html"
-logging.info(f"Injecting from path: {inject_path}")
-
-subprocess.run(
-    f"chmod +x inject-head-stuff.sh && ./inject-head-stuff.sh {index_path} {inject_path}",
-    shell=True,
-)
-
-
 @st.cache_data
 def make_df(data, columns):
     df = pd.DataFrame(data, columns=columns)
